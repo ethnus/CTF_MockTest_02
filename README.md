@@ -14,11 +14,12 @@ This is a **Capture The Flag (CTF)** challenge focused on AWS container orchestr
 - **VPC Infrastructure** with public and private subnets (networking & routing issues)
 - **Application Load Balancer** with target groups (integration & health check issues)
 - **ECS Fargate Cluster** with containerized services (configuration & scaling issues)
-- **Service Discovery** for microservice communication (DNS & routing policy issues)
 - **Auto Scaling** configuration for dynamic scaling (threshold & policy issues)
 - **Security Groups** for network security (missing rules & governance issues)
-- **IAM Roles** for service permissions (missing Service Discovery permissions)
 - **CloudWatch Logs** for container logging
+- **NAT Gateway** for private subnet internet access
+
+**Note**: This version is optimized for AWS Academy Learner Lab environments and focuses on core container orchestration concepts within available permissions.
 
 ### The 12 Challenges
 After deployment, the evaluation will show **12 INCOMPLETE** challenges:
@@ -26,17 +27,17 @@ After deployment, the evaluation will show **12 INCOMPLETE** challenges:
 1. **Network security: task communication** - Configure proper security group rules for container access
 2. **Resource governance: security groups** - Ensure compliance with organizational tagging standards
 3. **Load balancer: health verification** - Fix health check configuration for proper service detection
-4. **Container platform: service permissions** - Enable Service Discovery access for microservices
-5. **Service discovery: routing optimization** - Configure optimal DNS routing policies
-6. **Performance optimization: memory allocation** - Adjust container resource limits for proper operation
-7. **Container configuration: port mapping** - Align container ports with load balancer expectations
-8. **Application monitoring: health checks** - Implement container-level health verification
-9. **Service orchestration: availability** - Ensure adequate service replica count for high availability
-10. **Deployment strategy: rolling updates** - Configure proper deployment parameters for zero-downtime updates
-11. **Auto scaling: performance thresholds** - Optimize scaling triggers for production workloads
-12. **Infrastructure foundation: access logging** - Complete load balancer observability configuration
+4. **Container platform: resource allocation** - Optimize container memory and CPU settings
+5. **Performance optimization: memory allocation** - Adjust container resource limits for proper operation
+6. **Container configuration: port mapping** - Align container ports with load balancer expectations
+7. **Application monitoring: health checks** - Implement container-level health verification
+8. **Service orchestration: availability** - Ensure adequate service replica count for high availability
+9. **Deployment strategy: rolling updates** - Configure proper deployment parameters for zero-downtime updates
+10. **Auto scaling: performance thresholds** - Optimize scaling triggers for production workloads
+11. **Infrastructure foundation: access logging** - Complete load balancer observability configuration
+12. **End-to-end verification: application accessibility** - Ensure the full application stack is functional
 
-This challenge simulates a real-world AWS environment where you'll need to deploy, secure, and troubleshoot a containerized microservices architecture while working within the constraints of AWS Academy Learner Lab.
+This challenge simulates a real-world AWS environment where you'll need to deploy, secure, and troubleshoot a containerized application infrastructure while working within the constraints of AWS Academy Learner Lab.
 
 ## 🏗️ Architecture
 
