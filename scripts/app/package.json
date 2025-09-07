@@ -1,0 +1,21 @@
+{
+  "name": "ethnus-mocktest02-webapp",
+  "version": "1.0.0",
+  "description": "Sample Node.js application for Ethnus Mock Test 02 - Container Orchestration",
+  "main": "app.js",
+  "scripts": {
+    "start": "node app.js",
+    "dev": "nodemon app.js"
+  },
+  "dependencies": {
+    "express": "^4.18.2"
+  },
+  "devDependencies": {
+    "nodemon": "^3.0.1"
+  },
+  "engines": {
+    "node": ">=16.0.0"
+  },
+  "author": "Ethnus AWS Training",
+  "license": "MIT"
+}
