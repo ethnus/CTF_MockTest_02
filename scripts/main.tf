@@ -321,7 +321,7 @@ resource "aws_ecs_task_definition" "app" {
   network_mode             = "awsvpc"
   cpu                      = 256
   # CHALLENGE 6: Intentionally insufficient memory
-  memory             = 256 # Should be at least 512 for this app
+  memory             = 512 # Valid minimum for 256 CPU, but could be optimized to 1024 for better performance
   execution_role_arn = data.aws_iam_role.ecs_task_execution_role.arn
   task_role_arn      = data.aws_iam_role.ecs_task_role.arn
 
