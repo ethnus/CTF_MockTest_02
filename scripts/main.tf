@@ -293,106 +293,26 @@ resource "aws_cloudwatch_log_group" "ecs" {
   })
 }
 
-# ECS Task Execution Role
-resource "aws_iam_role" "ecs_task_execution_role" {
-  name = "${var.prefix}-ecs-task-execution-role"
-
-  assume_role_policy = jsonencode({
-    Version = "2012-10-17"
-    Statement = [
-      {
-        Action = "sts:AssumeRole"
-        Effect = "Allow"
-        Principal = {
-          Service = "ecs-tasks.amazonaws.com"
-        }
-      }
-    ]
-  })
-
-  tags = merge(local.common_tags, {
-    Name = "${var.prefix}-ecs-task-execution-role"
-  })
+# Data source to get existing ECS task execution role
+# AWS Academy Learner Lab provides this role by default
+data "aws_iam_role" "ecs_task_execution_role" {
+  name = "LabRole"
 }
 
-resource "aws_iam_role_policy_attachment" "ecs_task_execution_role_policy" {
-  role       = aws_iam_role.ecs_task_execution_role.name
-  policy_arn = "arn:aws:iam::aws:policy/service-role/AmazonECSTaskExecutionRolePolicy"
+# Data source to get existing ECS task role 
+# Using the same LabRole since we can't create custom roles
+# Data source to get existing ECS task role 
+# Using the same LabRole since we can't create custom roles
+data "aws_iam_role" "ecs_task_role" {
+  name = "LabRole"
 }
 
-# ECS Task Role
-resource "aws_iam_role" "ecs_task_role" {
-  name = "${var.prefix}-ecs-task-role"
+# Note: Custom IAM policies removed due to AWS Academy Learner Lab limitations
+# CHALLENGE 4: Service Discovery would normally require custom permissions
 
-  assume_role_policy = jsonencode({
-    Version = "2012-10-17"
-    Statement = [
-      {
-        Action = "sts:AssumeRole"
-        Effect = "Allow"
-        Principal = {
-          Service = "ecs-tasks.amazonaws.com"
-        }
-      }
-    ]
-  })
-
-  tags = merge(local.common_tags, {
-    Name = "${var.prefix}-ecs-task-role"
-  })
-}
-
-# CHALLENGE 4: Task role missing Service Discovery permissions
-resource "aws_iam_role_policy" "ecs_task_policy" {
-  name = "${var.prefix}-ecs-task-policy"
-  role = aws_iam_role.ecs_task_role.id
-
-  # Intentionally missing servicediscovery permissions
-  policy = jsonencode({
-    Version = "2012-10-17"
-    Statement = [
-      {
-        Effect = "Allow"
-        Action = [
-          "logs:CreateLogStream",
-          "logs:PutLogEvents"
-        ]
-        Resource = "${aws_cloudwatch_log_group.ecs.arn}:*"
-      }
-    ]
-  })
-}
-
-# Service Discovery Namespace
-resource "aws_service_discovery_private_dns_namespace" "main" {
-  name = "${var.prefix}.local"
-  vpc  = aws_vpc.main.id
-
-  tags = merge(local.common_tags, {
-    Name = "${var.prefix}-service-discovery"
-  })
-}
-
-# Service Discovery Service
-resource "aws_service_discovery_service" "app" {
-  name = "webapp"
-
-  dns_config {
-    namespace_id = aws_service_discovery_private_dns_namespace.main.id
-
-    dns_records {
-      ttl  = 10
-      type = "A"
-    }
-
-    # CHALLENGE 5: Intentionally wrong routing policy
-    routing_policy = "WEIGHTED" # Should be "MULTIVALUE"
-  }
-
-  tags = merge(local.common_tags, {
-    Name = "${var.prefix}-app-service-discovery"
-  })
-}
+# Note: Service Discovery removed due to AWS Academy Learner Lab limitations
+# CHALLENGE 5: Service Discovery would normally be configured here
+# In this simplified version, we'll use ALB health checks for service discovery
 
 # ECS Task Definition
 resource "aws_ecs_task_definition" "app" {
@@ -402,8 +322,8 @@ resource "aws_ecs_task_definition" "app" {
   cpu                      = 256
   # CHALLENGE 6: Intentionally insufficient memory
   memory             = 256 # Should be at least 512 for this app
-  execution_role_arn = aws_iam_role.ecs_task_execution_role.arn
-  task_role_arn      = aws_iam_role.ecs_task_role.arn
+  execution_role_arn = data.aws_iam_role.ecs_task_execution_role.arn
+  task_role_arn      = data.aws_iam_role.ecs_task_role.arn
 
   container_definitions = jsonencode([
     {
@@ -474,9 +394,8 @@ resource "aws_ecs_service" "app" {
     container_port   = 80
   }
 
-  service_registries {
-    registry_arn = aws_service_discovery_service.app.arn
-  }
+  # Note: Service registries removed due to Service Discovery limitations
+  # CHALLENGE 5: Service Discovery would normally be configured here
 
   # CHALLENGE 10: Missing deployment configuration for rolling updates
   # deployment_configuration {
@@ -485,8 +404,7 @@ resource "aws_ecs_service" "app" {
   # }
 
   depends_on = [
-    aws_lb_listener.app,
-    aws_iam_role_policy_attachment.ecs_task_execution_role_policy
+    aws_lb_listener.app
   ]
 
   tags = merge(local.common_tags, {
@@ -563,11 +481,6 @@ output "alb_zone_id" {
 output "ecs_cluster_name" {
   description = "Name of the ECS cluster"
   value       = aws_ecs_cluster.main.name
-}
-
-output "service_discovery_namespace" {
-  description = "Service discovery namespace"
-  value       = aws_service_discovery_private_dns_namespace.main.name
 }
 
 output "target_group_arn" {
