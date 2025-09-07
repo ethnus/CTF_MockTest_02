@@ -48,17 +48,41 @@ install_tools() {
     # Install Terraform if not present
     if ! command -v terraform &> /dev/null; then
         print_status "Installing Terraform..."
-        wget -O- https://apt.releases.hashicorp.com/gpg | sudo gpg --dearmor -o /usr/share/keyrings/hashicorp-archive-keyring.gpg
-        echo "deb [signed-by=/usr/share/keyrings/hashicorp-archive-keyring.gpg] https://apt.releases.hashicorp.com $(lsb_release -cs) main" | sudo tee /etc/apt/sources.list.d/hashicorp.list
-        sudo apt update && sudo apt install terraform -y
+        
+        # Detect OS and install accordingly
+        if command -v yum &> /dev/null; then
+            # Amazon Linux / RHEL / CentOS
+            sudo yum install -y yum-utils
+            sudo yum-config-manager --add-repo https://rpm.releases.hashicorp.com/AmazonLinux/hashicorp.repo
+            sudo yum -y install terraform
+        elif command -v apt &> /dev/null; then
+            # Ubuntu / Debian
+            wget -O- https://apt.releases.hashicorp.com/gpg | sudo gpg --dearmor -o /usr/share/keyrings/hashicorp-archive-keyring.gpg
+            echo "deb [signed-by=/usr/share/keyrings/hashicorp-archive-keyring.gpg] https://apt.releases.hashicorp.com $(lsb_release -cs) main" | sudo tee /etc/apt/sources.list.d/hashicorp.list
+            sudo apt update && sudo apt install terraform -y
+        else
+            # Manual installation for other systems
+            print_status "Installing Terraform manually..."
+            TERRAFORM_VERSION="1.5.7"
+            wget https://releases.hashicorp.com/terraform/${TERRAFORM_VERSION}/terraform_${TERRAFORM_VERSION}_linux_amd64.zip
+            unzip terraform_${TERRAFORM_VERSION}_linux_amd64.zip
+            sudo mv terraform /usr/local/bin/
+            rm terraform_${TERRAFORM_VERSION}_linux_amd64.zip
+        fi
     else
-        print_success "Terraform is already installed: $(terraform version -json | jq -r '.terraform_version')"
+        print_success "Terraform is already installed: $(terraform version | head -n1)"
     fi
     
     # Install jq if not present
     if ! command -v jq &> /dev/null; then
         print_status "Installing jq..."
-        sudo apt update && sudo apt install jq -y
+        if command -v yum &> /dev/null; then
+            sudo yum install -y jq
+        elif command -v apt &> /dev/null; then
+            sudo apt update && sudo apt install jq -y
+        else
+            print_warning "Could not install jq automatically. Please install manually."
+        fi
     else
         print_success "jq is already installed"
     fi
