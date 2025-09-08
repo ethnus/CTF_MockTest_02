@@ -225,10 +225,11 @@ resource "aws_lb" "main" {
 
 # Target Group for ECS Service
 resource "aws_lb_target_group" "app" {
-  name     = "${var.prefix}-app-tg"
-  port     = 3000
-  protocol = "HTTP"
-  vpc_id   = aws_vpc.main.id
+  name        = "${var.prefix}-app-tg"
+  port        = 3000
+  protocol    = "HTTP"
+  vpc_id      = aws_vpc.main.id
+  target_type = "ip"  # Required for Fargate with awsvpc network mode
 
   # CHALLENGE 3: Intentionally wrong health check configuration
   health_check {
