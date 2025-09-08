@@ -294,11 +294,29 @@ export AWS_SESSION_TOKEN="your-token"
 **"jq command not found"**
 ```bash
 # Install jq for your system
+# Amazon Linux/CloudShell:
+sudo yum install jq -y
 # Ubuntu/Debian:
 sudo apt-get install jq
 # macOS:
 brew install jq
 # Windows: Download from https://jqlang.github.io/jq/
+```
+
+**"ELBv2 Target Group already exists" or "CloudWatch Log Group already exists"**
+```bash
+# These errors occur when a previous deployment partially completed
+# Clean up conflicting resources and redeploy:
+
+# Option 1: Destroy existing resources and redeploy
+bash teardown.sh  # Clean up all resources
+bash deploy.sh    # Redeploy from scratch
+
+# Option 2: Import existing resources (advanced)
+# Get the existing target group ARN and log group name from AWS Console
+terraform import aws_lb_target_group.app <target-group-arn>
+terraform import aws_cloudwatch_log_group.ecs /ecs/ethnus-mocktest-02
+terraform apply
 ```
 
 **ECS Tasks not starting**
